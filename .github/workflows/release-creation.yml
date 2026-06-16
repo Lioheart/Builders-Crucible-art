@@ -1,0 +1,52 @@
+name: Release Creation
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Populate Versioned keys in Manifest
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          VERSION="${RELEASE_TAG#v}"
+
+          jq \
+            --arg version "$VERSION" \
+            --arg url "https://github.com/$REPOSITORY" \
+            --arg manifest "https://github.com/Lioheart/$REPOSITORY/releases/latest/download/module.json" \
+            --arg download "https://github.com/$REPOSITORY/releases/download/$RELEASE_TAG/module.zip" \
+            '.version = $version
+             | .url = $url
+             | .manifest = $manifest
+             | .download = $download' \
+            module.json > module.tmp.json
+
+          mv module.tmp.json module.json
+
+      - name: Create Module Archive
+        run: |
+          zip --recurse-paths ./module.zip \
+            module.json babele-register.js src/ lang/ styles/ static/
+
+      - name: Upload Files to Published Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          gh release upload "$RELEASE_TAG" \
+            module.json \
+            module.zip \
+            --repo "$REPOSITORY" \
+            --clobber

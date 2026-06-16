@@ -2,7 +2,7 @@
   "id": "builders-crucible-art-overrides",
   "title": "Builder's Crucible Art Overrides",
   "description": "Overrides actor portraits and prototype token images for Builder's Crucible Pregen Characters.",
-  "version": "1.0.0",
+  "version": "vDev",
   "compatibility": {
     "minimum": "14.362",
     "verified": "14.364"
@@ -28,5 +28,8 @@
   },
   "esmodules": [
     "scripts/art-overrides.mjs"
-  ]
+  ],
+  "url": "Filled in by the release workflow",
+  "manifest": "Filled in by the release workflow",
+  "download": "Filled in by the release workflow"
 }
